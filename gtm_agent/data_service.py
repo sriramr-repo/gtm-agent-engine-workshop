@@ -23,6 +23,28 @@ __all__ = [
 # lookups within a run are served without rebuilding.
 _PROFILES = {}
 
+_PUBLIC_PROSPECT_FIELDS = (
+    "name", "email", "annual_revenue", "enrichment_source", "disqualified",
+)
+_ENRICHMENT_FIELDS = ("engagement_history", "account_details", "tech_stack")
+
+
+def _public_prospect_fields(record, prospect_id=None, *, include_enrichment=False):
+    "Return an allow-listed prospect projection."
+    projection = {
+        field: record[field]
+        for field in _PUBLIC_PROSPECT_FIELDS
+        if field in record
+    }
+    projection["prospect_id"] = record.get("prospect_id", prospect_id)
+    if include_enrichment:
+        projection.update({
+            field: record[field]
+            for field in _ENRICHMENT_FIELDS
+            if field in record
+        })
+    return projection
+
 # ---------------------------------------------------------------------------
 # Public data-access functions
 # ---------------------------------------------------------------------------
